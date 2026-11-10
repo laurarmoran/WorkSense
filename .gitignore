@@ -1,0 +1,23 @@
+
+# Herramientas descargadas
+/tools/
+
+# Carpetas de compilacion
+**/build/
+**/cmake-build-*/
+
+# Ejecutables y bibliotecas
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+*.o
+*.obj
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Configuracion local de usuario
+.vscode/settings.json
