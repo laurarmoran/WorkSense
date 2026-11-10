@@ -5,6 +5,7 @@
 # Carpetas de compilacion
 **/build/
 **/cmake-build-*/
+**/build-ninja/
 
 # Ejecutables y bibliotecas
 *.exe
