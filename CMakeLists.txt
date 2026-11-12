@@ -13,6 +13,7 @@ add_executable(worksense
     src/main.cpp
     src/Alarm.cpp
     src/Device.cpp
+    src/DeviceManager.cpp
 )
 
 target_include_directories(worksense PRIVATE
