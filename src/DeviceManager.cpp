@@ -1,5 +1,11 @@
 #include "DeviceManager.h"
 #include <stdexcept>
+#include <utility>
+
+void DeviceManager::setAlarmHandler(AlarmHandler handler)
+{
+    alarmHandler_ = std::move(handler);
+}
 
 void DeviceManager::addDevice(const std::string &id, const std::string &name, double cpuUsage,
                             double memoryUsage, bool connected)
@@ -14,6 +20,10 @@ void DeviceManager::addDevice(const std::string &id, const std::string &name, do
     throw std::invalid_argument("Memory usage must be between 0 and 100");
   
     listOfDevices_.emplace_back(id, name, cpuUsage, memoryUsage, connected);
+    const auto &device = listOfDevices_.back();
+    const AlarmSeverity severity = evaluateAlarm(device);
+    if (severity != AlarmSeverity::Normal && alarmHandler_)
+        alarmHandler_(device.getId(), severity);
 }
 
 void DeviceManager::updateUsage(const std::string &id, double cpuUsage, double memoryUsage)
@@ -27,8 +37,16 @@ void DeviceManager::updateUsage(const std::string &id, double cpuUsage, double m
     {
         if (device.getId() == id)
         {
+            const AlarmSeverity previousSeverity = evaluateAlarm(device);
             device.cpuUsage_ = cpuUsage;
             device.memoryUsage_ = memoryUsage;
+            const AlarmSeverity currentSeverity = evaluateAlarm(device);
+            if (currentSeverity != AlarmSeverity::Normal &&
+                currentSeverity != previousSeverity &&
+                alarmHandler_)
+            {
+                alarmHandler_(device.getId(), currentSeverity);
+            }
             return;
         }
     }
@@ -71,7 +89,10 @@ void DeviceManager::setConnected(const std::string &id, bool connected)
     {
         if (device.getId() == id)
         {
+            const bool wasConnected = device.isConnected();
             device.setConnected(connected);
+            if (wasConnected && !connected && alarmHandler_)
+                alarmHandler_(device.getId(), AlarmSeverity::DeviceDisconnected);
             return;
         }
     }

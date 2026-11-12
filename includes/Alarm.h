@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Device.h"
 
 enum class AlarmSeverity

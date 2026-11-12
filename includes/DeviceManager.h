@@ -1,10 +1,13 @@
-#include "Device.h"
-
+#include "Alarm.h"
+#include <functional>
 #include <vector>
 
 class DeviceManager
 {
 public:
+    using AlarmHandler = std::function<void(const std::string &, AlarmSeverity)>;
+
+    void setAlarmHandler(AlarmHandler handler);
     void addDevice(const std::string &id, const std::string &name, double cpuUsage,
                    double memoryUsage, bool connected = true);
     void updateUsage(const std::string &id, double cpuUsage, double memoryUsage);
@@ -15,4 +18,5 @@ public:
 
 private:
     std::vector<Device> listOfDevices_;
+    AlarmHandler alarmHandler_;
 };
