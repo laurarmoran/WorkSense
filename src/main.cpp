@@ -1,59 +1,28 @@
-#include <chrono>
-#include <iostream>
-#include <random>
-#include <stdexcept>
-#include <string>
-#include <thread>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QUrl>
 
-#include "Alarm.h"
-#include "DeviceManager.h"
+#include "DeviceController.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    DeviceManager deviceManager;
-    deviceManager.setAlarmHandler([](const std::string &deviceId, AlarmSeverity severity)
-    {
-        std::cout << "ALARM: " << alarmToString(severity)
-                  << " for device " << deviceId << '\n'
-                  << std::flush;
-    });
+    QGuiApplication app(argc, argv);
 
-    try
-    {
-        deviceManager.addDevice("SIM-TRAIN-01", "Railway Simulator", 42.5, 61.0, true);
-        deviceManager.addDevice("RAILWAY-TEST-01", "Railway Test Bench", 82.0, 72.0, true);
-        deviceManager.addDevice("MAINTENANCE-WS-01", "Maintenance Station", 94.0, 97.0, true);
-    }
-    catch (const std::invalid_argument &error)
-    {
-        std::cerr << "Error creating device: " << error.what() << '\n';
-        return 1;
-    }
+    QGuiApplication::setApplicationName("WorkSense");
+    QGuiApplication::setOrganizationName("WorkSense");
 
-    std::thread simulationThread([&deviceManager]()
-    {
-        std::random_device randomDevice;
-        std::mt19937 generator(randomDevice());
-        std::uniform_int_distribution<int> usageDistribution(5, 100);
-        std::bernoulli_distribution disconnectEvent(0.05);
+    DeviceController deviceController;
 
-        while (true)
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-            for (const auto &device : deviceManager.getListOfDevices())
-            {
-                if (!device.isConnected())
-                    continue;
+    QQmlApplicationEngine engine;
 
-                deviceManager.updateUsage(
-                    device.getId(),
-                    usageDistribution(generator),
-                    usageDistribution(generator));
+    engine.rootContext()->setContextProperty(
+        "deviceController", &deviceController);
 
-                if (disconnectEvent(generator))
-                    deviceManager.setConnected(device.getId(), false);
-            }
-        }
-    });
-    simulationThread.join();
+    engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
+
+    if (engine.rootObjects().isEmpty())
+        return -1;
+
+    return app.exec();
 }

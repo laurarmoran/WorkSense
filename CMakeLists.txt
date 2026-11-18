@@ -8,17 +8,41 @@ project(WorkSense
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
 
-add_executable(worksense
+find_package(Qt6 6.4 REQUIRED COMPONENTS
+    Quick
+    QuickControls2
+)
+
+qt_add_executable(worksense
     src/main.cpp
     src/Alarm.cpp
     src/Device.cpp
     src/DeviceManager.cpp
+    src/DeviceController.cpp
+
+    includes/Device.h
+    includes/DeviceManager.h
+    includes/Alarm.h
+    includes/DeviceController.h
 )
 
 target_include_directories(worksense PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/includes
 )
+
+target_link_libraries(worksense PRIVATE
+    Qt6::Quick
+    Qt6::QuickControls2
+)
+
+qt_add_resources(worksense "worksense_qml"
+    PREFIX "/"
+    FILES
+        qml/Main.qml
+)
+
 
 if(MINGW)
     get_filename_component(MINGW_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
