@@ -4,7 +4,7 @@
 AlarmSeverity evaluateAlarm(const Device &device)
 {
     if (!device.isConnected())
-        return AlarmSeverity::DeviceDisconnected;
+        return AlarmSeverity::Disconnected;
 
     if (device.cpuUsage_ >= 90.0 || device.memoryUsage_ >= 95.0)
         return AlarmSeverity::Critical;
@@ -25,8 +25,8 @@ std::string alarmToString(AlarmSeverity severity)
         return "WARNING";
     case AlarmSeverity::Critical:
         return "CRITICAL";
-    case AlarmSeverity::DeviceDisconnected:
-        return "DEVICE_DISCONNECTED";
+    case AlarmSeverity::Disconnected:
+        return "DISCONNECTED";
     }
     return "UNKNOWN";
 }

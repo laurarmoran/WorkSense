@@ -1,6 +1,7 @@
 #include "Alarm.h"
 #include <functional>
 #include <vector>
+#include <QByteArray>
 
 class DeviceManager
 {
@@ -15,6 +16,7 @@ public:
     int removeDevice(const std::string &id);
     bool isConnected(const std::string &id) const;
     void setConnected(const std::string &id, bool connected);
+    void processMessage(const QByteArray &message);
 
 private:
     std::vector<Device> listOfDevices_;

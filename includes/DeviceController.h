@@ -7,31 +7,30 @@
 #include <random>
 #include "DeviceManager.h"
 
-
 class DeviceController : public QObject
 {
     Q_OBJECT
-    
+
     Q_PROPERTY(QVariantList devices READ devices NOTIFY dataChanged)
     Q_PROPERTY(QVariantList alarms READ alarms NOTIFY dataChanged)
     Q_PROPERTY(int activeCount READ activeCount NOTIFY dataChanged)
     Q_PROPERTY(int warningCount READ warningCount NOTIFY dataChanged)
     Q_PROPERTY(int criticalCount READ criticalCount NOTIFY dataChanged)
 
-    public:
+public:
     explicit DeviceController(QObject *parent = nullptr);
 
     QVariantList devices() const;
     QVariantList alarms() const;
 
     int activeCount() const;
-    int warningCount() const;  
+    int warningCount() const;
     int criticalCount() const;
 
-    signals:
+signals:
     void dataChanged();
 
-    private:
+private:
     void initializedDevices();
     void updateSimulation();
     void addAlarm(const QString &deviceId, AlarmSeverity severity);
@@ -46,4 +45,7 @@ class DeviceController : public QObject
     std::bernoulli_distribution disconnectEvent_{0.02};
 
     QVariantList alarms_;
+    
+private slots:
+    void handleMessage(const QByteArray &message);
 };

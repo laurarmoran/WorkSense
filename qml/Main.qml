@@ -16,257 +16,260 @@ ApplicationWindow {
 
     property string currentPage: "Overview"
 
-        function severityColor(severity)
-        {
-            switch (severity) {
-                case "NORMAL": return "#35C98B"
-                case "WARNING": return "#F5B942"
-                case "CRITICAL": return "#F05B65"
-                case "DISCONNECTED": return "#8995A3"
-                default: return "#8995A3"
+    function severityColor(severity) {
+        switch (severity) {
+        case "NORMAL":
+            return "#35C98B";
+        case "WARNING":
+            return "#F5B942";
+        case "CRITICAL":
+            return "#F05B65";
+        case "DISCONNECTED":
+            return "#8995A3";
+        default:
+            return "#8995A3";
+        }
+    }
+
+    component MetricBar: ColumnLayout {
+        property string label: ""
+        property real value: 0
+        property color accent: "#35B9D0"
+
+        spacing: 7
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            Label {
+                text: label
+                color: "#A7B3C1"
+                font.pixelSize: 12
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            Label {
+                text: Math.round(value) + "%"
+                color: "#E8EEF5"
+                font.pixelSize: 12
+                font.bold: true
             }
         }
 
-        component MetricBar: ColumnLayout {
-        property string label: ""
-            property real value: 0
-                property color accent: "#35B9D0"
+        Rectangle {
+            Layout.fillWidth: true
+            height: 7
+            radius: 4
+            color: "#303D49"
 
-                    spacing: 7
+            Rectangle {
+                width: parent.width * Math.max(0, Math.min(100, value)) / 100
+                height: parent.height
+                radius: parent.radius
+                color: accent
+            }
+        }
+    }
 
-                    RowLayout {
-                        Layout.fillWidth: true
+    RowLayout {
+        anchors.fill: parent
+        spacing: 0
 
-                        Label {
-                            text: label
-                            color: "#A7B3C1"
-                            font.pixelSize: 12
-                        }
+        // SIDEBAR
+        Rectangle {
+            Layout.preferredWidth: 225
+            Layout.fillHeight: true
+            color: "#151F29"
 
-                        Item { Layout.fillWidth: true }
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 25
 
-                        Label {
-                            text: Math.round(value) + "%"
-                            color: "#E8EEF5"
-                            font.pixelSize: 12
-                            font.bold: true
-                        }
+                ColumnLayout {
+                    spacing: 4
+
+                    Label {
+                        text: "WORKSENSE"
+                        color: "#EAF2F8"
+                        font.pixelSize: 21
+                        font.bold: true
+                        font.letterSpacing: 2
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 7
-                        radius: 4
-                        color: "#303D49"
+                    Label {
+                        text: "ENGINEERING MONITOR"
+                        color: "#6F8294"
+                        font.pixelSize: 9
+                        font.letterSpacing: 1.5
+                    }
+                }
 
-                        Rectangle {
-                            width: parent.width * Math.max(0, Math.min(100, value)) / 100
-                            height: parent.height
-                            radius: parent.radius
-                            color: accent
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: "#2B3946"
+                }
+
+                Label {
+                    text: "WORKSPACE"
+                    color: "#718294"
+                    font.pixelSize: 10
+                    font.bold: true
+                }
+
+                Repeater {
+                    model: ["Overview", "Devices", "Alarms", "Settings"]
+
+                    delegate: Rectangle {
+                        required property string modelData
+
+                        Layout.fillWidth: true
+                        height: 43
+                        radius: 7
+                        color: currentPage === modelData ? "#243D4D" : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 12
+                            spacing: 12
+
+                            Rectangle {
+                                width: 3
+                                height: 22
+                                radius: 2
+                                color: currentPage === modelData ? "#35B9D0" : "transparent"
+                            }
+
+                            Label {
+                                text: modelData
+                                color: currentPage === modelData ? "#EAF7FC" : "#A0ADBA"
+                                font.pixelSize: 13
+                                Layout.fillWidth: true
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: currentPage = modelData
+                            cursorShape: Qt.PointingHandCursor
                         }
                     }
                 }
 
-                RowLayout {
-                    anchors.fill: parent
-                    spacing: 0
+                Item {
+                    Layout.fillHeight: true
+                }
 
-                    // SIDEBAR
-                    Rectangle {
-                        Layout.preferredWidth: 225
-                        Layout.fillHeight: true
-                        color: "#151F29"
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 65
+                    radius: 8
+                    color: "#1C2A35"
 
-                        ColumnLayout {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 25
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 5
 
-                            ColumnLayout {
-                                spacing: 4
+                        Label {
+                            text: "WORKSENSE"
+                            color: "#DCE7EF"
+                            font.pixelSize: 11
+                            font.bold: true
+                        }
 
-                                Label {
-                                    text: "WORKSENSE"
-                                    color: "#EAF2F8"
-                                    font.pixelSize: 21
-                                    font.bold: true
-                                    font.letterSpacing: 2
-                                }
-
-                                Label {
-                                    text: "ENGINEERING MONITOR"
-                                    color: "#6F8294"
-                                    font.pixelSize: 9
-                                    font.letterSpacing: 1.5
-                                }
-                            }
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 1
-                                color: "#2B3946"
-                            }
-
-                            Label {
-                                text: "WORKSPACE"
-                                color: "#718294"
-                                font.pixelSize: 10
-                                font.bold: true
-                            }
-
-                            Repeater {
-                                model: ["Overview", "Devices", "Alarms", "Settings"]
-
-                                delegate: Rectangle {
-                                    required property string modelData
-
-                                    Layout.fillWidth: true
-                                    height: 43
-                                    radius: 7
-                                    color: currentPage === modelData
-                                    ? "#243D4D" : "transparent"
-
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 12
-                                        spacing: 12
-
-                                        Rectangle {
-                                            width: 3
-                                            height: 22
-                                            radius: 2
-                                            color: currentPage === modelData
-                                            ? "#35B9D0" : "transparent"
-                                        }
-
-                                        Label {
-                                            text: modelData
-                                            color: currentPage === modelData
-                                            ? "#EAF7FC" : "#A0ADBA"
-                                            font.pixelSize: 13
-                                            Layout.fillWidth: true
-                                        }
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: currentPage = modelData
-                                        cursorShape: Qt.PointingHandCursor
-                                    }
-                                }
-                            }
-
-                            Item { Layout.fillHeight: true }
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 65
-                                radius: 8
-                                color: "#1C2A35"
-
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: 5
-
-                                    Label {
-                                        text: "WORKSENSE"
-                                        color: "#DCE7EF"
-                                        font.pixelSize: 11
-                                        font.bold: true
-                                    }
-
-                                    Label {
-                                        text: "Prototype 0.1"
-                                        color: "#718294"
-                                        font.pixelSize: 10
-                                    }
-                                }
-                            }
+                        Label {
+                            text: "Prototype 0.1"
+                            color: "#718294"
+                            font.pixelSize: 10
                         }
                     }
+                }
+            }
+        }
 
-                    // MAIN CONTENT
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.margins: 27
-                        spacing: 22
+        // MAIN CONTENT
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins: 27
+            spacing: 22
 
-                        RowLayout {
-                            Layout.fillWidth: true
+            RowLayout {
+                Layout.fillWidth: true
 
-                            ColumnLayout {
-                                spacing: 4
+                ColumnLayout {
+                    spacing: 4
 
-                                Label {
-                                    text: currentPage
-                                    color: "#EDF3F8"
-                                    font.pixelSize: 27
-                                    font.bold: true
-                                }
+                    Label {
+                        text: currentPage
+                        color: "#EDF3F8"
+                        font.pixelSize: 27
+                        font.bold: true
+                    }
 
-                                Label {
-                                    text: "Engineering systems monitoring"
-                                    color: "#8595A5"
-                                    font.pixelSize: 12
-                                }
-                            }
+                    Label {
+                        text: "Engineering systems monitoring"
+                        color: "#8595A5"
+                        font.pixelSize: 12
+                    }
+                }
 
-                            Item { Layout.fillWidth: true }
+                Item {
+                    Layout.fillWidth: true
+                }
 
-                            Rectangle {
-                                radius: 7
-                                color: "#1C302D"
-                                border.color: "#285344"
-                                implicitWidth: 125
-                                implicitHeight: 34
+                Rectangle {
+                    radius: 7
+                    color: "#1C302D"
+                    border.color: "#285344"
+                    implicitWidth: 125
+                    implicitHeight: 34
 
-                                RowLayout {
-                                    anchors.centerIn: parent
-                                    spacing: 8
+                    RowLayout {
+                        anchors.centerIn: parent
+                        spacing: 8
 
-                                    Rectangle {
-                                        width: 7
-                                        height: 7
-                                        radius: 4
-                                        color: "#35C98B"
-                                    }
-
-                                    Label {
-                                        text: "SIMULATION"
-                                        color: "#7BE0B1"
-                                        font.pixelSize: 10
-                                        font.bold: true
-                                    }
-                                }
-                            }
+                        Rectangle {
+                            width: 7
+                            height: 7
+                            radius: 4
+                            color: "#35C98B"
                         }
 
-                        // SUMMARY CARDS
-                        GridLayout {
-                            Layout.fillWidth: true
-                            columns: 3
-                            columnSpacing: 15
-
-                            Repeater {
-                                model: [
-                                {
-                                    title: "CONNECTED DEVICES",
-                                    value: deviceController.activeCount,
-                                    accent: "#35B9D0"
-                                },
-                            {
-                                title: "WARNINGS",
-                                value: deviceController.warningCount,
-                                accent: "#F5B942"
-                            },
-                        {
-                            title: "CRITICAL / OFFLINE",
-                            value: deviceController.criticalCount,
-                            accent: "#F05B65"
+                        Label {
+                            text: "SIMULATION"
+                            color: "#7BE0B1"
+                            font.pixelSize: 10
+                            font.bold: true
                         }
-                    ]
+                    }
+                }
+            }
+
+            // SUMMARY CARDS
+            GridLayout {
+                Layout.fillWidth: true
+                columns: 3
+                columnSpacing: 15
+
+                Repeater {
+                    model: [{
+                            "title": "CONNECTED DEVICES",
+                            "value": deviceController.activeCount,
+                            "accent": "#35B9D0"
+                        }, {
+                            "title": "CRITICAL / OFFLINE",
+                            "value": deviceController.criticalCount,
+                            "accent": "#F05B65"
+                        }, {
+                            "title": "WARNINGS",
+                            "value": deviceController.warningCount,
+                            "accent": "#F5B942"
+                        }]
 
                     delegate: Rectangle {
                         required property var modelData
@@ -305,14 +308,15 @@ ApplicationWindow {
                 Layout.fillWidth: true
 
                 Label {
-                    text: currentPage === "Devices"
-                    ? "Device inventory" : "Device overview"
+                    text: currentPage === "Devices" ? "Device inventory" : "Device overview"
                     color: "#E5EDF4"
                     font.pixelSize: 17
                     font.bold: true
                 }
 
-                Item { Layout.fillWidth: true }
+                Item {
+                    Layout.fillWidth: true
+                }
 
                 Label {
                     text: deviceController.devices.length + " DEVICES"
@@ -387,20 +391,14 @@ ApplicationWindow {
                                 Layout.fillWidth: true
                                 label: "CPU USAGE"
                                 value: deviceData.cpu
-                                accent: deviceData.cpu >= 90
-                                ? "#F05B65"
-                                : deviceData.cpu >= 75
-                                ? "#F5B942" : "#35B9D0"
+                                accent: deviceData.cpu >= 90 ? "#F05B65" : deviceData.cpu >= 75 ? "#F5B942" : "#35B9D0"
                             }
 
                             MetricBar {
                                 Layout.fillWidth: true
                                 label: "MEMORY USAGE"
                                 value: deviceData.memory
-                                accent: deviceData.memory >= 95
-                                ? "#F05B65"
-                                : deviceData.memory >= 80
-                                ? "#F5B942" : "#35B9D0"
+                                accent: deviceData.memory >= 95 ? "#F05B65" : deviceData.memory >= 80 ? "#F5B942" : "#35B9D0"
                             }
                         }
                     }

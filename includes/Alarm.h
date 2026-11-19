@@ -6,8 +6,8 @@ enum class AlarmSeverity
 {
     Normal,
     Warning,
-    Critical, 
-    DeviceDisconnected
+    Critical,
+    Disconnected
 };
 
 AlarmSeverity evaluateAlarm(const Device &device);

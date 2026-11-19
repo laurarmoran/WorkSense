@@ -18,6 +18,12 @@ DeviceController::DeviceController(QObject *parent) : QObject(parent), generator
     simulationTimer_.start(2000);
 }
 
+void DeviceController::handleMessage(const QByteArray &message)
+{
+    deviceManager_.processMessage(message);
+    emit dataChanged();
+}
+
 void DeviceController::initializedDevices()
 {
     deviceManager_.addDevice(
@@ -91,8 +97,8 @@ QString DeviceController::severityToString(AlarmSeverity severity) const
         return "WARNING";
     case AlarmSeverity::Critical:
         return "CRITICAL";
-    case AlarmSeverity::DeviceDisconnected:
-        return "DEVICE_DISCONNECTED";
+    case AlarmSeverity::Disconnected:
+        return "DISCONNECTED";
     }
     return "UNKNOWN";
 }
@@ -112,7 +118,7 @@ void DeviceController::addAlarm(const QString &deviceId, AlarmSeverity severity)
     case AlarmSeverity::Critical:
         alarm["message"] = "Critical resource usage";
         break;
-    case AlarmSeverity::DeviceDisconnected:
+    case AlarmSeverity::Disconnected:
         alarm["message"] = "Device disconnected";
         break;
     default:

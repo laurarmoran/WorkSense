@@ -13,6 +13,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt6 6.4 REQUIRED COMPONENTS
     Quick
     QuickControls2
+    Network
 )
 
 qt_add_executable(worksense
@@ -35,6 +36,7 @@ target_include_directories(worksense PRIVATE
 target_link_libraries(worksense PRIVATE
     Qt6::Quick
     Qt6::QuickControls2
+    Qt6::Network
 )
 
 qt_add_resources(worksense "worksense_qml"
