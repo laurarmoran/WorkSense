@@ -2,21 +2,22 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QUrl>
-
+#include <iostream>
 #include "DeviceController.h"
 #include "UdpReceiver.h"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-    
+
     QGuiApplication::setApplicationName("WorkSense");
     QGuiApplication::setOrganizationName("WorkSense");
-    
-    DeviceController deviceController;
-    
+
     UdpReceiver udpReceiver;
-    udpReceiver.startListening(50001);
+    DeviceController deviceController(udpReceiver);
+    auto port = 50001;
+    udpReceiver.startListening(port) ? std::cout << "Listening on port " << port << std::endl
+                                     : std::cerr << "Failed to bind to port " << port << std::endl;
 
     QQmlApplicationEngine engine;
 

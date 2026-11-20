@@ -8,12 +8,14 @@ project(WorkSense
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 6.4 REQUIRED COMPONENTS
     Quick
     QuickControls2
     Network
+    Core
 )
 
 qt_add_executable(worksense
@@ -22,11 +24,13 @@ qt_add_executable(worksense
     src/Device.cpp
     src/DeviceManager.cpp
     src/DeviceController.cpp
+    src/UdpReceiver.cpp
 
     includes/Device.h
     includes/DeviceManager.h
     includes/Alarm.h
     includes/DeviceController.h
+    includes/UdpReceiver.h
 )
 
 target_include_directories(worksense PRIVATE
@@ -34,9 +38,10 @@ target_include_directories(worksense PRIVATE
 )
 
 target_link_libraries(worksense PRIVATE
+    Qt6::Core
+    Qt6::Network
     Qt6::Quick
     Qt6::QuickControls2
-    Qt6::Network
 )
 
 qt_add_resources(worksense "worksense_qml"
@@ -57,6 +62,7 @@ if(MINGW)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${MINGW_BIN_DIR}/${runtime_dll}"
                 "$<TARGET_FILE_DIR:worksense>"
+            VERBATIM
         )
     endforeach()
 endif()

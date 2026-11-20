@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <random>
 #include "DeviceManager.h"
+#include "UdpReceiver.h"
 
 class DeviceController : public QObject
 {
@@ -18,7 +19,7 @@ class DeviceController : public QObject
     Q_PROPERTY(int criticalCount READ criticalCount NOTIFY dataChanged)
 
 public:
-    explicit DeviceController(QObject *parent = nullptr);
+    explicit DeviceController(UdpReceiver &udpReceiver, QObject *parent = nullptr);
 
     QVariantList devices() const;
     QVariantList alarms() const;
@@ -45,7 +46,7 @@ private:
     std::bernoulli_distribution disconnectEvent_{0.02};
 
     QVariantList alarms_;
-    
+
 private slots:
     void handleMessage(const QByteArray &message);
 };

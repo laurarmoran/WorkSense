@@ -2,8 +2,10 @@
 #include <QDateTime>
 #include <algorithm>
 #include <stdexcept>
+#include <iostream>
 
-DeviceController::DeviceController(QObject *parent) : QObject(parent), generator_(std::random_device{}())
+DeviceController::DeviceController(UdpReceiver &udpReceiver, QObject *parent)
+    : QObject(parent), generator_(std::random_device{}())
 {
     deviceManager_.setAlarmHandler(
         [this](const std::string &deviceId, AlarmSeverity severity)
@@ -16,12 +18,21 @@ DeviceController::DeviceController(QObject *parent) : QObject(parent), generator
     connect(&simulationTimer_, &QTimer::timeout, this, &DeviceController::updateSimulation);
 
     simulationTimer_.start(2000);
+
+    connect(&udpReceiver, &UdpReceiver::messageReceived, this, &DeviceController::handleMessage);
 }
 
 void DeviceController::handleMessage(const QByteArray &message)
 {
-    deviceManager_.processMessage(message);
-    emit dataChanged();
+    try
+    {
+        deviceManager_.processMessage(message);
+        emit dataChanged();
+    }
+    catch (const std::exception &error)
+    {
+        std::cerr << "Failed to process UDP message: " << error.what() << std::endl;
+    }
 }
 
 void DeviceController::initializedDevices()

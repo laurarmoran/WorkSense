@@ -3,6 +3,14 @@
 #include <vector>
 #include <QByteArray>
 
+enum class actions
+{
+    add,
+    update,
+    remove,
+    setConnected
+};
+
 class DeviceManager
 {
 public:

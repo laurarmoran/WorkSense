@@ -1,9 +1,11 @@
 .PHONY: build clean go
 
+CMAKE = cmake 
 clean:
-	tools/cmake/bin/cmake.exe --build build --target clean
+	$(CMAKE) --build build --target clean
 
 build:
-	tools/cmake/bin/cmake.exe --build build
+	$(CMAKE) --build build
+
 go: build
-	build/worksense.exe
+	build/worksense

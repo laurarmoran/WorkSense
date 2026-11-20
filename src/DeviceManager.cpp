@@ -1,45 +1,43 @@
 #include "DeviceManager.h"
 #include <stdexcept>
 #include <utility>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <iostream>
 
 void DeviceManager::processMessage(const QByteArray &message)
 {
     // Receives json from UdpReceiver and processes it
+    std::cout << "Message received: " << message.toStdString() << std::endl;
     QJsonDocument doc = QJsonDocument::fromJson(message);
     if (!doc.isObject())
         throw std::invalid_argument("Invalid JSON message");
-    
+
     QJsonObject obj = doc.object();
 
     std::string action = obj.value("action").toString().toStdString();
 
-    switch(action)
-    {
-        case "add":
-            addDevice(
-                obj.value("deviceId").toString().toStdString(),
-                obj.value("deviceName").toString().toStdString(),
-                obj.value("cpuUsage").toString().toDouble(),
-                obj.value("memoryUsage").toString().toDouble(),
-                obj.value("status").toString() == "CONNECTED");
-            break;
-        case "update":
-            updateUsage(
-                obj.value("deviceId").toString().toStdString(),
-                obj.value("cpuUsage").toString().toDouble(),
-                obj.value("memoryUsage").toString().toDouble());
-            break;
-        case "remove":
-            removeDevice(obj.value("deviceId").toString().toStdString());
-            break;
-        case "setConnected":
-            setConnected(
-                obj.value("deviceId").toString().toStdString(),
-                obj.value("status").toString() == "CONNECTED");
-            break;
-        default:
-            throw std::invalid_argument("Unknown action: " + action);
-    }
+    if (action != "add" && action != "update" && action != "remove" && action != "setConnected")
+        throw std::invalid_argument("Unknown action: " + action);
+    else if (action == "add")
+        addDevice(
+            obj.value("deviceId").toString().toStdString(),
+            obj.value("deviceName").toString().toStdString(),
+            obj.value("cpuUsage").toString().toDouble(),
+            obj.value("memoryUsage").toString().toDouble(),
+            obj.value("status").toString() == "CONNECTED");
+    else if (action == "update")
+        updateUsage(
+            obj.value("deviceId").toString().toStdString(),
+            obj.value("cpuUsage").toString().toDouble(),
+            obj.value("memoryUsage").toString().toDouble());
+    else if (action == "remove")
+        removeDevice(obj.value("deviceId").toString().toStdString());
+    else if (action == "setConnected")
+        setConnected(
+            obj.value("deviceId").toString().toStdString(),
+            obj.value("status").toString() == "CONNECTED");
 }
 
 void DeviceManager::setAlarmHandler(AlarmHandler handler)
