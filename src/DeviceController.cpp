@@ -5,19 +5,13 @@
 #include <iostream>
 
 DeviceController::DeviceController(UdpReceiver &udpReceiver, QObject *parent)
-    : QObject(parent), generator_(std::random_device{}())
+    : QObject(parent)
 {
     deviceManager_.setAlarmHandler(
         [this](const std::string &deviceId, AlarmSeverity severity)
         {
             addAlarm(QString::fromStdString(deviceId), severity);
         });
-
-    initializedDevices();
-
-    connect(&simulationTimer_, &QTimer::timeout, this, &DeviceController::updateSimulation);
-
-    simulationTimer_.start(2000);
 
     connect(&udpReceiver, &UdpReceiver::messageReceived, this, &DeviceController::handleMessage);
 }
@@ -33,18 +27,6 @@ void DeviceController::handleMessage(const QByteArray &message)
     {
         std::cerr << "Failed to process UDP message: " << error.what() << std::endl;
     }
-}
-
-void DeviceController::initializedDevices()
-{
-    deviceManager_.addDevice(
-        "SIM-TRAIN-01", "Railway Simulator", 42.5, 61.0, true);
-
-    deviceManager_.addDevice(
-        "RAILWAY-TEST-01", "Railway Test Bench", 82.0, 72.0, true);
-
-    deviceManager_.addDevice(
-        "MAINTENANCE-WS-01", "Maintenance Station", 94.0, 97.0, true);
 }
 
 QVariantList DeviceController::devices() const
@@ -141,25 +123,6 @@ void DeviceController::addAlarm(const QString &deviceId, AlarmSeverity severity)
 
     while (alarms_.size() > 10)
         alarms_.removeLast();
-
-    emit dataChanged();
-}
-
-void DeviceController::updateSimulation()
-{
-    for (const auto &device : deviceManager_.getListOfDevices())
-    {
-        if (!device.isConnected())
-            continue;
-
-        double newCpuUsage = usageDistribution_(generator_);
-        double newMemoryUsage = usageDistribution_(generator_);
-
-        deviceManager_.updateUsage(device.getId(), newCpuUsage, newMemoryUsage);
-
-        if (disconnectEvent_(generator_))
-            deviceManager_.setConnected(device.getId(), false);
-    }
 
     emit dataChanged();
 }

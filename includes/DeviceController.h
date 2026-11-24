@@ -3,8 +3,6 @@
 #include <QObject>
 #include <QVariantList>
 #include <QVariantMap>
-#include <QTimer>
-#include <random>
 #include "DeviceManager.h"
 #include "UdpReceiver.h"
 
@@ -32,19 +30,11 @@ signals:
     void dataChanged();
 
 private:
-    void initializedDevices();
-    void updateSimulation();
     void addAlarm(const QString &deviceId, AlarmSeverity severity);
     QVariantMap deviceToMap(const Device &device) const;
     QString severityToString(AlarmSeverity severity) const;
 
     DeviceManager deviceManager_;
-    QTimer simulationTimer_;
-
-    std::mt19937 generator_;
-    std::uniform_int_distribution<int> usageDistribution_{5, 100};
-    std::bernoulli_distribution disconnectEvent_{0.02};
-
     QVariantList alarms_;
 
 private slots:

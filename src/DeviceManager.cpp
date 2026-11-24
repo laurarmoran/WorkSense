@@ -1,6 +1,7 @@
 #include "DeviceManager.h"
 #include <stdexcept>
 #include <utility>
+#include <algorithm>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -28,10 +29,24 @@ void DeviceManager::processMessage(const QByteArray &message)
             obj.value("memoryUsage").toString().toDouble(),
             obj.value("status").toString() == "CONNECTED");
     else if (action == "update")
-        updateUsage(
-            obj.value("deviceId").toString().toStdString(),
-            obj.value("cpuUsage").toString().toDouble(),
-            obj.value("memoryUsage").toString().toDouble());
+    {
+        const std::string id = obj.value("deviceId").toString().toStdString();
+        const std::string name = obj.value("deviceName").toString().toStdString();
+        const double cpuUsage = obj.value("cpuUsage").toString().toDouble();
+        const double memoryUsage = obj.value("memoryUsage").toString().toDouble();
+        const bool connected = obj.value("status").toString() == "CONNECTED";
+        const bool knownDevice = std::any_of(
+            listOfDevices_.begin(), listOfDevices_.end(),
+            [&id](const Device &device) { return device.getId() == id; });
+
+        if (knownDevice)
+        {
+            setConnected(id, connected);
+            updateUsage(id, cpuUsage, memoryUsage);
+        }
+        else
+            addDevice(id, name, cpuUsage, memoryUsage, connected);
+    }
     else if (action == "remove")
         removeDevice(obj.value("deviceId").toString().toStdString());
     else if (action == "setConnected")
@@ -66,10 +81,10 @@ void DeviceManager::addDevice(const std::string &id, const std::string &name, do
 
 void DeviceManager::updateUsage(const std::string &id, double cpuUsage, double memoryUsage)
 {
-    if (cpuUsage < 5.0 || cpuUsage > 100.0)
-        throw std::invalid_argument("CPU usage must be between 5 and 100");
-    if (memoryUsage < 5.0 || memoryUsage > 100.0)
-        throw std::invalid_argument("Memory usage must be between 5 and 100");
+    if (cpuUsage < 0.0 || cpuUsage > 100.0)
+        throw std::invalid_argument("CPU usage must be between 0 and 100");
+    if (memoryUsage < 0.0 || memoryUsage > 100.0)
+        throw std::invalid_argument("Memory usage must be between 0 and 100");
 
     for (auto &device : listOfDevices_)
     {
