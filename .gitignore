@@ -1,6 +1,7 @@
 
 # Herramientas descargadas
 /tools/
+/test/
 
 # Carpetas de compilacion
 **/build/
